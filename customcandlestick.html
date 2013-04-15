@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Canslestick</title>
+
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script type="text/javascript" src="./custom.js"></script>
+		
+		<script type="text/javascript">
+var startx,starty,endx,endy,id=1;
+var drawing = false;	
+	
+		$(function() {
+	$.getJSON('http://www.highcharts.com/samples/data/jsonp.php?filename=aapl-ohlc.json&callback=?', function(data) {
+
+		// create the chart
+		chart = new Highcharts.StockChart({
+			chart : {
+				renderTo : 'container'
+			},
+
+			rangeSelector : {
+				selected : 1
+			},
+
+			title : {
+				text : 'AAPL Stock Price'
+			},
+
+			series : [{
+			
+				type : 'candlestick',
+				name : 'AAPL Stock Price',
+				data : data,
+				dataGrouping : {
+					units : [
+						['week', // unit name
+						[1] // allowed multiples
+					], [
+						'month', 
+						[1, 2, 3, 4, 6]]
+					]
+				}
+			}]
+		});
+ chart.renderer.text('text insert test', 200, 200)
+        .attr({
+            rotation: -25
+        })
+        .css({
+            color: '#4572A7',
+            fontSize: '16px'
+        })
+        .add();		
+	var group=chart.renderer.g().add();
+				chart.container.onmousedown = function(e) {
+		//alert(e.layerX+"=>"+e.layerY);
+										startx=e.layerX;
+										starty=e.layerY;
+				console.log(startx+starty+"down");			
+									
+									
+									
+									}
+									chart.container.onmouseup = function(e){
+									console.log("up");
+drawing = !drawing;
+			}
+									chart.container.onmousemove=function(e) { 
+if(drawing){						
+			endx=e.layerX;
+			endy=e.layerY;
+			console.log(startx+starty+"up"+endx+"/"+endy);			
+										var id=1;
+										var linelength,x,y;
+										
+										if(id==1)
+										drawline(startx,starty,endx,endy);	
+										else {
+										if(startx && starty && endx && endy)
+										x=Math.abs(startx-endx);
+										y=Math.abs(starty-endy);
+										linelength=Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+										}
+									}
+									}
+		function drawline(startx,starty,endx,endy) {
+group.destroy();
+		 group=chart.renderer.g().add();
+		
+		chart.renderer.path(['M', startx,starty, 'L', endx,endy])
+				.attr({
+				'stroke-width': 2,
+				stroke: 'black'
+				})
+				.add(group);
+		}
+	
+
+		setMouseTracking(false);
+	
+	});
+	});
+
+
+function setMouseTracking(track){
+if ( typeof chart != undefined){
+console.log("1")
+for (var count  = 0 ; count <chart.series.length ; count ++){
+chart.series[count].options.enableMouseTracking = track;
+	console.log(count);
+	}
+	}
+}
+		</script>
+		
+	</head>
+	<body>
+<script src=" ./js/highstock.js"></script>
+<script src=" ./js/modules/exporting.js"></script>
+
+<div id="container" style="height: 500px; min-width: 500px"></div>
+	</body>
+</html>
